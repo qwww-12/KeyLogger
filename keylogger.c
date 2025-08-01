@@ -43,6 +43,11 @@ XRecordRange	*alloc_range(Display *dpl)
 	return (rng);
 }
 
+bool	SpecialChar(int Char)
+{
+	return ((Char >= 24 && Char <= 33) || (Char >= 38 && Char <= 46) || (Char >= 52 && Char <= 58));
+}
+
 void	callback(XPointer xp, XRecordInterceptData *data)
 {
 	Display		*dpl;
@@ -67,7 +72,7 @@ void	callback(XPointer xp, XRecordInterceptData *data)
 
 			dpl = XOpenDisplay(NULL);
 			XGetKeyboardControl(dpl, &key_board);
-			if ((key_board.led_mask & 1) == 1)
+			if (SpecialChar((int)key_code) && (key_board.led_mask & 1) == 1)
 				level = 1;
 			XQueryKeymap(dpl, bit_map);
 			if (((bit_map[50 / 8]) & (1 << 50 % 8)) || ((bit_map[62 / 8]) & (1 << 62 % 8)))
